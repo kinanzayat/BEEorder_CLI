@@ -1,0 +1,7 @@
+{
+  "cartId": "replace-with-cart-id",
+  "serviceType": "delivery",
+  "addressId": "replace-with-address-id",
+  "paymentMethod": "cash",
+  "note": "Leave at door"
+}
