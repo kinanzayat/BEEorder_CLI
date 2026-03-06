@@ -79,20 +79,34 @@ function getAuthPayload(flags, mode) {
 
   const phone = flags.phone || flags.mobile || flags.phoneNumber;
   const countryCode = flags.countryCode || flags.country || '963';
+  const normalizedCountryCode = String(countryCode).replace(/^\+/, '');
+  const rawPhone = requireValue(phone, 'Missing phone/mobile. Provide --phone/--mobile or --payload/--file.');
+  let normalizedMobile = String(rawPhone).trim();
+
+  if (normalizedMobile.startsWith('+')) {
+    const withoutPlus = normalizedMobile.slice(1);
+    if (withoutPlus.startsWith(normalizedCountryCode)) {
+      normalizedMobile = withoutPlus.slice(normalizedCountryCode.length);
+    } else {
+      normalizedMobile = withoutPlus;
+    }
+  }
+
+  if (normalizedMobile.startsWith('0') && normalizedMobile.length >= 10) {
+    normalizedMobile = normalizedMobile.replace(/^0+/, '');
+  }
 
   if (mode === 'verify') {
     const otp = flags.otp || flags.code;
-    requireValue(phone, 'Missing phone. Provide --phone or --payload/--file.');
     requireValue(otp, 'Missing OTP. Provide --otp or --payload/--file.');
     return {
-      phone: String(phone),
+      mobile: normalizedMobile,
       otp: String(otp)
     };
   }
 
-  requireValue(phone, 'Missing phone. Provide --phone or --payload/--file.');
   return {
-    phone: String(phone),
+    mobile: normalizedMobile,
     countryCode: String(countryCode)
   };
 }
